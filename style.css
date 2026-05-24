@@ -53,7 +53,7 @@ input[type='range']::-moz-range-thumb { width: 20px; height: 20px; border-radius
 
 .dock__volume-panel { position: absolute; right: 0; bottom: 3.3rem; width: 78px; padding: 0.55rem 0.4rem; display: grid; gap: 0.45rem; justify-items: center; }
 .dock__volume-label { font-size: 0.66rem; color: var(--muted); text-align: center; }
-.dock__volume-input { writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; width: 10px; height: 120px; background: linear-gradient(0deg, var(--accent), var(--accent-2)) 0 100% / 100% var(--volume-percent) no-repeat, var(--range-track); }
+.dock__volume-input { writing-mode: vertical-lr; direction: rtl; -webkit-appearance: slider-vertical; appearance: slider-vertical; width: 12px; height: 120px; background: linear-gradient(0deg, var(--accent), var(--accent-2)) 0 100% / 100% var(--volume-percent) no-repeat, var(--range-track); }
 .dock__volume-panel output { min-width: auto; text-align: center; font-size: 0.8rem; }
 
 @keyframes riseIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -69,3 +69,6 @@ input[type='range']::-moz-range-thumb { width: 20px; height: 20px; border-radius
   .dock { width: calc(100vw - 0.8rem); bottom: 0.4rem; }
   .sound-card { min-height: 150px; }
 }
+
+.sound-card.is-disabled { opacity: 0.6; filter: grayscale(0.35); }
+.sound-card.is-disabled .btn { cursor: not-allowed; }
