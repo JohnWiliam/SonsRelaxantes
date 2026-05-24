@@ -181,10 +181,10 @@ function updateMediaSession(playing) {
 
   navigator.mediaSession.metadata = new MediaMetadata({
     title: titleText,
-    artist: 'Atelier Web',
-    album: 'Deck de Áudios',
+    artist: 'John Atelier',
+    album: 'Magic`s songs',
     artwork: [
-      // Aqui nós referenciamos a imagem que você vai colocar na pasta assets!
+      // Referencia da capa do "album".
       { src: './assets/cover.png', sizes: '512x512', type: 'image/png' }
     ]
   });
