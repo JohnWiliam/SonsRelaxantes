@@ -23,25 +23,27 @@
         <p>Sons relaxantes</p>
       </header>
 
-      <section class="master-controls glass" aria-label="Controles gerais">
-        <div class="master-controls__actions">
-          <button id="toggleAll" class="btn btn--primary" type="button">Tocar tudo</button>
-          <button id="stopAll" class="btn" type="button">Parar tudo</button>
-        </div>
-
-        <label class="master-volume" for="masterVolume">
-          <span>Volume geral</span>
-          <div class="range-wrap">
-            <input id="masterVolume" type="range" min="0" max="100" value="70" />
-            <output id="masterVolumeValue" for="masterVolume">70%</output>
-          </div>
-        </label>
-      </section>
-
       <section>
         <ul id="soundList" class="sound-list" aria-label="Lista de sons"></ul>
       </section>
     </main>
+
+    <aside class="floating-dock glass" aria-label="Dock de reprodução">
+      <button id="toggleAll" class="dock-btn dock-btn--main" type="button" aria-label="Tocar ou pausar tudo">
+        <span class="icon-play" aria-hidden="true">▶</span>
+      </button>
+
+      <div class="dock-volume">
+        <button id="volumeToggle" class="dock-btn" type="button" aria-label="Abrir controle de volume">
+          <span aria-hidden="true">🔊</span>
+        </button>
+        <div id="volumePanel" class="volume-panel" hidden>
+          <label class="volume-panel__label" for="masterVolume">Volume geral</label>
+          <input id="masterVolume" type="range" min="0" max="100" value="70" orient="vertical" />
+          <output id="masterVolumeValue" for="masterVolume">70%</output>
+        </div>
+      </div>
+    </aside>
 
     <template id="soundItemTemplate">
       <li class="sound-card glass">

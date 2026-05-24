@@ -19,9 +19,10 @@ const SOUND_BASE_PATH = './assets/sounds';
 const soundList = document.querySelector('#soundList');
 const template = document.querySelector('#soundItemTemplate');
 const toggleAll = document.querySelector('#toggleAll');
-const stopAll = document.querySelector('#stopAll');
 const masterVolume = document.querySelector('#masterVolume');
 const masterVolumeValue = document.querySelector('#masterVolumeValue');
+const volumeToggle = document.querySelector('#volumeToggle');
+const volumePanel = document.querySelector('#volumePanel');
 
 let globalVolumeFactor = Number(masterVolume.value) / 100;
 
@@ -85,7 +86,8 @@ const players = SOUND_LIBRARY.map(([key, label], index) => {
 
 function refreshMasterButton() {
   const isAnythingPlaying = players.some(({ audio }) => !audio.paused);
-  toggleAll.textContent = isAnythingPlaying ? 'Pausar tudo' : 'Tocar tudo';
+  toggleAll.setAttribute('aria-label', isAnythingPlaying ? 'Pausar tudo' : 'Tocar tudo');
+  toggleAll.querySelector('.icon-play').textContent = isAnythingPlaying ? '⏸' : '▶';
 }
 
 toggleAll.addEventListener('click', async () => {
@@ -110,16 +112,6 @@ toggleAll.addEventListener('click', async () => {
   refreshMasterButton();
 });
 
-stopAll.addEventListener('click', () => {
-  players.forEach(({ audio, setPlayingState }) => {
-    audio.pause();
-    audio.currentTime = 0;
-    setPlayingState(false);
-  });
-
-  refreshMasterButton();
-});
-
 masterVolume.addEventListener('input', (event) => {
   globalVolumeFactor = Number(event.target.value) / 100;
   masterVolumeValue.textContent = `${event.target.value}%`;
@@ -129,4 +121,21 @@ masterVolume.addEventListener('input', (event) => {
 
 masterVolume.style.setProperty('--volume-percent', `${masterVolume.value}%`);
 masterVolumeValue.textContent = `${masterVolume.value}%`;
+
+volumeToggle.addEventListener('click', () => {
+  const isHidden = volumePanel.hasAttribute('hidden');
+  if (isHidden) {
+    volumePanel.removeAttribute('hidden');
+  } else {
+    volumePanel.setAttribute('hidden', '');
+  }
+});
+
+document.addEventListener('click', (event) => {
+  const clickedInsideVolume = volumePanel.contains(event.target) || volumeToggle.contains(event.target);
+  if (!clickedInsideVolume) {
+    volumePanel.setAttribute('hidden', '');
+  }
+});
+
 refreshMasterButton();
