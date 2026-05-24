@@ -11,7 +11,7 @@
     />
     <meta
       name="description"
-      content="Song Atelier Web: misture sons ambientes online para foco, relaxamento e sono."
+      content="Blanket Web: misture sons ambientes online para foco, relaxamento e sono."
     />
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -67,7 +67,6 @@
             min="0"
             max="100"
             value="70"
-            orient="vertical"
             aria-label="Volume geral"
           />
           <output id="masterVolumeValue" for="masterVolume">70%</output>
@@ -76,10 +75,9 @@
     </aside>
 
     <template id="soundItemTemplate">
-      <li class="sound-card glass">
+      <li class="sound-card glass" tabindex="0" role="button" aria-pressed="false">
         <div class="sound-card__top">
           <h2 class="sound-card__title"></h2>
-          <button class="btn sound-card__toggle" type="button">Tocar</button>
         </div>
         <label class="sound-card__volume-wrap">
           <span>Volume</span>
