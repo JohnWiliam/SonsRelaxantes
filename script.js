@@ -133,9 +133,20 @@ function getPlayingPlayers() {
   return state.players.filter((player) => player.isPlayable && !player.audio.paused);
 }
 
+// 📌 Função de interface atualizada para alternar os SVGs
 function renderDockIcon(isPlaying) {
-  const icon = dockToggleAll.querySelector('span');
-  if (icon) icon.className = isPlaying ? 'icon-pause' : 'icon-play';
+  const playIcon = dockToggleAll.querySelector('.icon-play');
+  const pauseIcon = dockToggleAll.querySelector('.icon-pause');
+
+  if (playIcon && pauseIcon) {
+    if (isPlaying) {
+      playIcon.setAttribute('hidden', '');
+      pauseIcon.removeAttribute('hidden');
+    } else {
+      playIcon.removeAttribute('hidden');
+      pauseIcon.setAttribute('hidden', '');
+    }
+  }
 
   dockToggleAll.setAttribute('aria-pressed', String(isPlaying));
   dockToggleAll.setAttribute('aria-label', isPlaying ? 'Pausar sons em reprodução' : 'Retomar sons pausados');
