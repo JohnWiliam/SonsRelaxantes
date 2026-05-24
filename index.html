@@ -33,7 +33,7 @@
         id="dockToggleAll"
         class="dock__btn dock__btn--play"
         type="button"
-        aria-label="Tocar ou pausar todos os sons"
+        aria-label="Tocar ou pausar sons selecionados"
         aria-pressed="false"
       >
         <span class="icon-play" aria-hidden="true"></span>
@@ -72,8 +72,9 @@
       <li class="sound-card glass">
         <div class="sound-card__top">
           <h2 class="sound-card__title"></h2>
-          <button class="btn sound-card__toggle" type="button">Tocar</button>
+          <button class="btn sound-card__toggle" type="button" aria-pressed="false">Selecionar</button>
         </div>
+        <p class="sound-card__status" aria-live="polite">Parado</p>
         <label class="sound-card__volume-wrap">
           <span>Volume</span>
           <div class="range-wrap">
