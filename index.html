@@ -23,32 +23,33 @@
         <p>Sons relaxantes</p>
       </header>
 
-      <section class="master-controls glass" aria-label="Controles gerais">
-        <div class="master-controls__actions">
-          <button id="toggleAll" class="btn btn--primary" type="button">Tocar tudo</button>
-          <button id="stopAll" class="btn" type="button">Parar tudo</button>
-        </div>
-
-        <label class="master-volume" for="masterVolume">
-          <span>Volume geral</span>
-          <div class="range-wrap">
-            <input id="masterVolume" type="range" min="0" max="100" value="70" />
-            <output id="masterVolumeValue" for="masterVolume">70%</output>
-          </div>
-        </label>
-      </section>
-
       <section>
         <ul id="soundList" class="sound-list" aria-label="Lista de sons"></ul>
       </section>
     </main>
 
+    <nav class="bottom-dock glass" aria-label="Controle de reprodução fixo">
+      <button id="toggleAll" class="dock-btn dock-btn--play" type="button" aria-label="Tocar ou pausar tudo">
+        <span class="dock-btn__icon" aria-hidden="true">▶</span>
+      </button>
+      <div class="dock-volume">
+        <button id="toggleVolume" class="dock-btn" type="button" aria-label="Abrir controle de volume">
+          <span class="dock-btn__icon" aria-hidden="true">🔊</span>
+        </button>
+        <label id="volumePanel" class="volume-panel glass" for="masterVolume" hidden>
+          <span>Volume geral</span>
+          <input id="masterVolume" type="range" min="0" max="100" value="70" orient="vertical" />
+          <output id="masterVolumeValue" for="masterVolume">70%</output>
+        </label>
+      </div>
+    </nav>
+
     <template id="soundItemTemplate">
       <li class="sound-card glass">
-        <div class="sound-card__top">
+        <button class="sound-card__icon-btn" type="button">
+          <span class="sound-card__emoji" aria-hidden="true">🎵</span>
           <h2 class="sound-card__title"></h2>
-          <button class="btn sound-card__toggle" type="button">Tocar</button>
-        </div>
+        </button>
         <label class="sound-card__volume-wrap">
           <span>Volume</span>
           <div class="range-wrap">
