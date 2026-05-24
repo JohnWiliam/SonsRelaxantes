@@ -87,7 +87,8 @@ const players = SOUND_LIBRARY.map(([key, label], index) => {
 });
 
 function renderDockIcon(isPlaying) {
-  dockToggleAll.innerHTML = `<span class="${isPlaying ? 'icon-pause' : 'icon-play'}" aria-hidden="true"></span>`;
+  const icon = dockToggleAll.querySelector('span');
+  if (icon) icon.className = isPlaying ? 'icon-pause' : 'icon-play';
   dockToggleAll.setAttribute('aria-pressed', String(isPlaying));
 }
 
