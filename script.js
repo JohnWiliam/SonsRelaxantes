@@ -181,7 +181,7 @@ function updateMediaSession(playing) {
 
   navigator.mediaSession.metadata = new MediaMetadata({
     title: titleText,
-    artist: 'Blanket Web',
+    artist: 'Atelier Web',
     album: 'Deck de Áudios',
     artwork: [
       // Aqui nós referenciamos a imagem que você vai colocar na pasta assets!
