@@ -1,8 +1,8 @@
 <div align="center">
   
-  # Sons Relaxantes (Relaxing Sounds) 🎧
+  # Ateliê Web de Sons (Songs Atelier Web) 🎧
   
-  **Blanket Web:** Misture sons ambientes online para foco, relaxamento e sono. / *Mix ambient sounds online for focus, relaxation, and sleep.*
+  **Songs Atelier Web:** Misture sons ambientes online para foco, relaxamento e sono. / *Mix ambient sounds online for focus, relaxation, and sleep.*
   
   [🇧🇷 Ler em Português](#-português-do-brasil) | [🇺🇸 Read in English](#-english)
 
