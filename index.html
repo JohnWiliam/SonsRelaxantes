@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sons relaxantes</title>
     <link
-    rel="icon"
-    type="image/svg+xml"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎶%3C/text%3E%3C/svg%3E"
-    >
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎶%3C/text%3E%3C/svg%3E"
+    />
     <meta
       name="description"
       content="Blanket Web: misture sons ambientes online para foco, relaxamento e sono."
@@ -23,32 +23,37 @@
         <p>Sons relaxantes</p>
       </header>
 
-      <section class="master-controls glass" aria-label="Controles gerais">
-        <div class="master-controls__actions">
-          <button id="toggleAll" class="btn btn--primary" type="button">Tocar tudo</button>
-          <button id="stopAll" class="btn" type="button">Parar tudo</button>
-        </div>
-
-        <label class="master-volume" for="masterVolume">
-          <span>Volume geral</span>
-          <div class="range-wrap">
-            <input id="masterVolume" type="range" min="0" max="100" value="70" />
-            <output id="masterVolumeValue" for="masterVolume">70%</output>
-          </div>
-        </label>
-      </section>
-
       <section>
         <ul id="soundList" class="sound-list" aria-label="Lista de sons"></ul>
       </section>
     </main>
 
+    <aside class="dock glass" aria-label="Dock de reprodução">
+      <button id="dockTogglePlayback" class="dock__btn dock__btn--primary" type="button" aria-label="Tocar ou pausar tudo">
+        <span id="dockPlaybackIcon" aria-hidden="true">▶</span>
+      </button>
+
+      <div class="dock__volume">
+        <button id="dockVolumeToggle" class="dock__btn" type="button" aria-label="Mostrar controle de volume" aria-expanded="false">
+          <span aria-hidden="true">🔊</span>
+        </button>
+
+        <div id="dockVolumePanel" class="dock__volume-panel glass" hidden>
+          <label class="dock__volume-label" for="masterVolume">
+            <span>Volume geral</span>
+            <input id="masterVolume" type="range" min="0" max="100" value="70" orient="vertical" />
+            <output id="masterVolumeValue" for="masterVolume">70%</output>
+          </label>
+        </div>
+      </div>
+    </aside>
+
     <template id="soundItemTemplate">
       <li class="sound-card glass">
-        <div class="sound-card__top">
+        <button class="sound-card__hit-area" type="button">
           <h2 class="sound-card__title"></h2>
-          <button class="btn sound-card__toggle" type="button">Tocar</button>
-        </div>
+          <span class="sound-card__icon" aria-hidden="true">▶</span>
+        </button>
         <label class="sound-card__volume-wrap">
           <span>Volume</span>
           <div class="range-wrap">

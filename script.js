@@ -18,10 +18,16 @@ const SOUND_BASE_PATH = './assets/sounds';
 
 const soundList = document.querySelector('#soundList');
 const template = document.querySelector('#soundItemTemplate');
-const toggleAll = document.querySelector('#toggleAll');
-const stopAll = document.querySelector('#stopAll');
+const dockTogglePlayback = document.querySelector('#dockTogglePlayback');
+const dockPlaybackIcon = document.querySelector('#dockPlaybackIcon');
+const dockVolumeToggle = document.querySelector('#dockVolumeToggle');
+const dockVolumePanel = document.querySelector('#dockVolumePanel');
 const masterVolume = document.querySelector('#masterVolume');
 const masterVolumeValue = document.querySelector('#masterVolumeValue');
+
+const environment = {
+  isTouch: window.matchMedia('(hover: none), (pointer: coarse)').matches,
+};
 
 let globalVolumeFactor = Number(masterVolume.value) / 100;
 
@@ -33,7 +39,8 @@ const players = SOUND_LIBRARY.map(([key, label], index) => {
 
   const item = template.content.firstElementChild.cloneNode(true);
   const title = item.querySelector('.sound-card__title');
-  const btn = item.querySelector('.sound-card__toggle');
+  const hitArea = item.querySelector('.sound-card__hit-area');
+  const icon = item.querySelector('.sound-card__icon');
   const slider = item.querySelector('.sound-card__volume');
   const sliderValue = item.querySelector('.sound-card__volume-value');
 
@@ -50,45 +57,48 @@ const players = SOUND_LIBRARY.map(([key, label], index) => {
   slider.addEventListener('input', applyVolume);
 
   const setPlayingState = (isPlaying) => {
-    btn.textContent = isPlaying ? 'Pausar' : 'Tocar';
-    btn.classList.toggle('is-playing', isPlaying);
+    icon.textContent = isPlaying ? '⏸' : '▶';
     item.classList.toggle('is-playing', isPlaying);
   };
 
-  btn.addEventListener('click', async () => {
-    try {
-      if (audio.paused) {
-        await audio.play();
-        setPlayingState(true);
-      } else {
-        audio.pause();
-        setPlayingState(false);
-      }
-    } catch (error) {
-      console.error(`Falha ao tocar ${label}:`, error);
-      btn.textContent = 'Erro ao tocar';
-    }
-
-    refreshMasterButton();
+  hitArea.addEventListener('click', async () => {
+    await togglePlayer(audio, setPlayingState, label);
+    refreshDockPlayback();
   });
 
   audio.addEventListener('error', () => {
-    btn.textContent = 'Arquivo ausente';
-    btn.disabled = true;
+    icon.textContent = '⚠';
+    hitArea.disabled = true;
+    hitArea.title = 'Arquivo ausente';
   });
 
   applyVolume();
   soundList.appendChild(item);
 
-  return { audio, btn, slider, item, setPlayingState };
+  return { audio, slider, setPlayingState };
 });
 
-function refreshMasterButton() {
-  const isAnythingPlaying = players.some(({ audio }) => !audio.paused);
-  toggleAll.textContent = isAnythingPlaying ? 'Pausar tudo' : 'Tocar tudo';
+async function togglePlayer(audio, setPlayingState, label) {
+  try {
+    if (audio.paused) {
+      await audio.play();
+      setPlayingState(true);
+    } else {
+      audio.pause();
+      setPlayingState(false);
+    }
+  } catch (error) {
+    console.error(`Falha ao tocar ${label}:`, error);
+  }
 }
 
-toggleAll.addEventListener('click', async () => {
+function refreshDockPlayback() {
+  const isAnythingPlaying = players.some(({ audio }) => !audio.paused);
+  dockPlaybackIcon.textContent = isAnythingPlaying ? '⏸' : '▶';
+  dockTogglePlayback.setAttribute('aria-label', isAnythingPlaying ? 'Pausar tudo' : 'Tocar tudo');
+}
+
+dockTogglePlayback.addEventListener('click', async () => {
   const isAnythingPlaying = players.some(({ audio }) => !audio.paused);
 
   if (isAnythingPlaying) {
@@ -107,17 +117,7 @@ toggleAll.addEventListener('click', async () => {
     }
   }
 
-  refreshMasterButton();
-});
-
-stopAll.addEventListener('click', () => {
-  players.forEach(({ audio, setPlayingState }) => {
-    audio.pause();
-    audio.currentTime = 0;
-    setPlayingState(false);
-  });
-
-  refreshMasterButton();
+  refreshDockPlayback();
 });
 
 masterVolume.addEventListener('input', (event) => {
@@ -127,6 +127,22 @@ masterVolume.addEventListener('input', (event) => {
   players.forEach(({ slider }) => slider.dispatchEvent(new Event('input')));
 });
 
+dockVolumeToggle.addEventListener('click', () => {
+  const isOpen = !dockVolumePanel.hidden;
+  dockVolumePanel.hidden = isOpen;
+  dockVolumeToggle.setAttribute('aria-expanded', String(!isOpen));
+});
+
+if (environment.isTouch) {
+  document.addEventListener('click', (event) => {
+    const clickedInside = dockVolumePanel.contains(event.target) || dockVolumeToggle.contains(event.target);
+    if (!clickedInside) {
+      dockVolumePanel.hidden = true;
+      dockVolumeToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
 masterVolume.style.setProperty('--volume-percent', `${masterVolume.value}%`);
 masterVolumeValue.textContent = `${masterVolume.value}%`;
-refreshMasterButton();
+refreshDockPlayback();
