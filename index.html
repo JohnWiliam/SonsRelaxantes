@@ -11,7 +11,7 @@
     />
     <meta
       name="description"
-      content="Blanket Web: misture sons ambientes online para foco, relaxamento e sono."
+      content="Song Atelier Web: misture sons ambientes online para foco, relaxamento e sono."
     />
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -36,7 +36,12 @@
         aria-label="Tocar ou pausar todos os sons"
         aria-pressed="false"
       >
-        <span class="icon-play" aria-hidden="true"></span>
+        <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="28" height="28" hidden>
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
       </button>
 
       <div class="dock__volume-area">
@@ -48,7 +53,9 @@
           aria-expanded="false"
           aria-controls="dockVolumePanel"
         >
-          <span class="icon-volume" aria-hidden="true"></span>
+          <svg class="icon-volume" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
         </button>
 
         <div id="dockVolumePanel" class="dock__volume-panel glass" hidden>
