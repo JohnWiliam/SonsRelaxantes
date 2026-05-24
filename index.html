@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sons relaxantes</title>
+    <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎶%3C/text%3E%3C/svg%3E"
+    >
+    <meta
+      name="description"
+      content="Blanket Web: misture sons ambientes online para foco, relaxamento e sono."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="app__header glass">
+        <p class="eyebrow">Experiência sonora imersiva</p>
+        <h1>Deck de áudios</h1>
+        <p>Sons relaxantes</p>
+      </header>
+
+      <section class="master-controls glass" aria-label="Controles gerais">
+        <div class="master-controls__actions">
+          <button id="toggleAll" class="btn btn--primary" type="button">Tocar tudo</button>
+          <button id="stopAll" class="btn" type="button">Parar tudo</button>
+        </div>
+
+        <label class="master-volume" for="masterVolume">
+          <span>Volume geral</span>
+          <div class="range-wrap">
+            <input id="masterVolume" type="range" min="0" max="100" value="70" />
+            <output id="masterVolumeValue" for="masterVolume">70%</output>
+          </div>
+        </label>
+      </section>
+
+      <section>
+        <ul id="soundList" class="sound-list" aria-label="Lista de sons"></ul>
+      </section>
+    </main>
+
+    <template id="soundItemTemplate">
+      <li class="sound-card glass">
+        <div class="sound-card__top">
+          <h2 class="sound-card__title"></h2>
+          <button class="btn sound-card__toggle" type="button">Tocar</button>
+        </div>
+        <label class="sound-card__volume-wrap">
+          <span>Volume</span>
+          <div class="range-wrap">
+            <input class="sound-card__volume" type="range" min="0" max="100" value="70" />
+            <output class="sound-card__volume-value">70%</output>
+          </div>
+        </label>
+      </li>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
