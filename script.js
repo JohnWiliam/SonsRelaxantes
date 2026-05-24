@@ -32,7 +32,6 @@ if (!soundList || !template || !dockToggleAll || !dockVolumeToggle || !dockVolum
 const state = {
   masterVolume: Number(masterVolume.value) / 100,
   players: [],
-  lastPlaybackSet: new Set(),
 };
 
 function buildPlayer(key, label, index) {
@@ -44,11 +43,10 @@ function buildPlayer(key, label, index) {
 
   const item = template.content.firstElementChild.cloneNode(true);
   const title = item.querySelector('.sound-card__title');
-  const btn = item.querySelector('.sound-card__toggle');
   const slider = item.querySelector('.sound-card__volume');
   const sliderValue = item.querySelector('.sound-card__volume-value');
 
-  if (!title || !btn || !slider || !sliderValue) {
+  if (!title || !slider || !sliderValue) {
     throw new Error(`Falha ao criar cartão do som "${label}".`);
   }
 
@@ -60,11 +58,12 @@ function buildPlayer(key, label, index) {
     label,
     audio,
     item,
-    btn,
+    title,
     slider,
     sliderValue,
     userVolume: Number(slider.value) / 100,
     isPlayable: true,
+    isSelected: false, // Nova memória de Estado
   };
 
   function updateVolume() {
@@ -74,52 +73,64 @@ function buildPlayer(key, label, index) {
     player.slider.style.setProperty('--volume-percent', `${player.slider.value}%`);
   }
 
-  function setPlayingState(isPlaying) {
-    player.btn.textContent = isPlaying ? 'Pausar' : 'Tocar';
-    player.btn.classList.toggle('is-playing', isPlaying);
-    player.item.classList.toggle('is-playing', isPlaying);
-    player.btn.setAttribute('aria-pressed', String(isPlaying));
-  }
-
   async function play() {
     if (!player.isPlayable) return false;
     try {
       await player.audio.play();
-      setPlayingState(true);
       return true;
     } catch (error) {
       console.error(`Falha ao tocar ${player.label}:`, error);
-      player.btn.textContent = 'Erro ao tocar';
       return false;
     }
   }
 
   function pause() {
     player.audio.pause();
-    setPlayingState(false);
   }
 
-  player.updateVolume = updateVolume;
-  player.setPlayingState = setPlayingState;
-  player.play = play;
-  player.pause = pause;
+  // Função central para alterar o estado do Card
+  async function toggleSelection() {
+    if (!player.isPlayable) return;
 
-  player.slider.addEventListener('input', updateVolume);
+    player.isSelected = !player.isSelected;
+    player.item.classList.toggle('is-selected', player.isSelected);
+    player.item.setAttribute('aria-pressed', String(player.isSelected));
 
-  player.btn.addEventListener('click', async () => {
-    if (player.audio.paused) {
+    if (player.isSelected) {
       await player.play();
     } else {
       player.pause();
     }
     syncDockState();
+  }
+
+  player.updateVolume = updateVolume;
+  player.play = play;
+  player.pause = pause;
+  player.toggleSelection = toggleSelection;
+
+  player.slider.addEventListener('input', updateVolume);
+
+  // O clique no Card inteiro agora o ativa (desde que não seja no controle de volume)
+  player.item.addEventListener('click', (e) => {
+    if (e.target.closest('.sound-card__volume-wrap')) return;
+    toggleSelection();
+  });
+
+  // Acessibilidade: permite apertar Enter ou Espaço com o Card focado
+  player.item.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target === player.item) {
+      e.preventDefault();
+      toggleSelection();
+    }
   });
 
   player.audio.addEventListener('error', () => {
-    player.btn.textContent = 'Arquivo ausente';
-    player.btn.disabled = true;
+    player.title.textContent = `${player.label} (Erro)`;
     player.isPlayable = false;
-    setPlayingState(false);
+    player.isSelected = false;
+    player.item.classList.remove('is-selected');
+    player.item.style.opacity = '0.5';
     syncDockState();
   });
 
@@ -133,7 +144,6 @@ function getPlayingPlayers() {
   return state.players.filter((player) => player.isPlayable && !player.audio.paused);
 }
 
-// 📌 Função de interface atualizada para alternar os SVGs
 function renderDockIcon(isPlaying) {
   const playIcon = dockToggleAll.querySelector('.icon-play');
   const pauseIcon = dockToggleAll.querySelector('.icon-pause');
@@ -154,26 +164,30 @@ function renderDockIcon(isPlaying) {
 
 function syncDockState() {
   const playing = getPlayingPlayers();
-
-  if (playing.length > 0) {
-    state.lastPlaybackSet = new Set(playing.map((player) => player.key));
-  }
-
   renderDockIcon(playing.length > 0);
 }
 
 async function toggleDockPlayback() {
   const playing = getPlayingPlayers();
 
+  // Se tem áudio rolando, pausamos todos. Repare que NÃO mexemos no player.isSelected!
   if (playing.length > 0) {
     playing.forEach((player) => player.pause());
     syncDockState();
     return;
   }
 
-  let targets = state.players.filter((player) => state.lastPlaybackSet.has(player.key));
-  if (targets.length === 0) {
-    targets = state.players.filter((player) => player.isPlayable);
+  // Se nada está tocando, buscamos todos os cards que estão com isSelected marcado
+  const targets = state.players.filter((player) => player.isSelected && player.isPlayable);
+
+  // Detalhe amigável: se o usuário clicar no Play global sem ter escolhido nenhum som,
+  // nós selecionamos o primeiro som como exemplo.
+  if (targets.length === 0 && state.players.length > 0) {
+    const first = state.players[0];
+    first.isSelected = true;
+    first.item.classList.add('is-selected');
+    first.item.setAttribute('aria-pressed', 'true');
+    targets.push(first);
   }
 
   for (const player of targets) {
