@@ -15,11 +15,13 @@ const SOUND_LIBRARY = [
 ];
 
 const SOUND_BASE_PATH = './assets/sounds';
+const isMobile = window.matchMedia('(max-width: 760px)').matches;
 
 const soundList = document.querySelector('#soundList');
 const template = document.querySelector('#soundItemTemplate');
-const toggleAll = document.querySelector('#toggleAll');
-const stopAll = document.querySelector('#stopAll');
+const dockToggleAll = document.querySelector('#dockToggleAll');
+const dockVolumeToggle = document.querySelector('#dockVolumeToggle');
+const dockVolumePanel = document.querySelector('#dockVolumePanel');
 const masterVolume = document.querySelector('#masterVolume');
 const masterVolumeValue = document.querySelector('#masterVolumeValue');
 
@@ -28,8 +30,9 @@ let globalVolumeFactor = Number(masterVolume.value) / 100;
 const players = SOUND_LIBRARY.map(([key, label], index) => {
   const audio = new Audio(`${SOUND_BASE_PATH}/${key}.ogg`);
   audio.loop = true;
-  audio.preload = 'auto';
+  audio.preload = isMobile ? 'metadata' : 'auto';
   audio.volume = globalVolumeFactor;
+  audio.playsInline = true;
 
   const item = template.content.firstElementChild.cloneNode(true);
   const title = item.querySelector('.sound-card__title');
@@ -69,7 +72,7 @@ const players = SOUND_LIBRARY.map(([key, label], index) => {
       btn.textContent = 'Erro ao tocar';
     }
 
-    refreshMasterButton();
+    refreshDockPlayButton();
   });
 
   audio.addEventListener('error', () => {
@@ -80,15 +83,21 @@ const players = SOUND_LIBRARY.map(([key, label], index) => {
   applyVolume();
   soundList.appendChild(item);
 
-  return { audio, btn, slider, item, setPlayingState };
+  return { audio, slider, setPlayingState };
 });
 
-function refreshMasterButton() {
-  const isAnythingPlaying = players.some(({ audio }) => !audio.paused);
-  toggleAll.textContent = isAnythingPlaying ? 'Pausar tudo' : 'Tocar tudo';
+function renderDockIcon(isPlaying) {
+  const icon = dockToggleAll.querySelector('span');
+  if (icon) icon.className = isPlaying ? 'icon-pause' : 'icon-play';
+  dockToggleAll.setAttribute('aria-pressed', String(isPlaying));
 }
 
-toggleAll.addEventListener('click', async () => {
+function refreshDockPlayButton() {
+  const isAnythingPlaying = players.some(({ audio }) => !audio.paused);
+  renderDockIcon(isAnythingPlaying);
+}
+
+dockToggleAll.addEventListener('click', async () => {
   const isAnythingPlaying = players.some(({ audio }) => !audio.paused);
 
   if (isAnythingPlaying) {
@@ -107,17 +116,27 @@ toggleAll.addEventListener('click', async () => {
     }
   }
 
-  refreshMasterButton();
+  refreshDockPlayButton();
 });
 
-stopAll.addEventListener('click', () => {
-  players.forEach(({ audio, setPlayingState }) => {
-    audio.pause();
-    audio.currentTime = 0;
-    setPlayingState(false);
-  });
+dockVolumeToggle.addEventListener('click', () => {
+  const isOpen = !dockVolumePanel.hasAttribute('hidden');
 
-  refreshMasterButton();
+  if (isOpen) {
+    dockVolumePanel.setAttribute('hidden', '');
+  } else {
+    dockVolumePanel.removeAttribute('hidden');
+  }
+
+  dockVolumeToggle.setAttribute('aria-expanded', String(!isOpen));
+});
+
+document.addEventListener('click', (event) => {
+  const insideDock = event.target.closest('.dock__volume-area');
+  if (!insideDock && !dockVolumePanel.hasAttribute('hidden')) {
+    dockVolumePanel.setAttribute('hidden', '');
+    dockVolumeToggle.setAttribute('aria-expanded', 'false');
+  }
 });
 
 masterVolume.addEventListener('input', (event) => {
@@ -129,4 +148,4 @@ masterVolume.addEventListener('input', (event) => {
 
 masterVolume.style.setProperty('--volume-percent', `${masterVolume.value}%`);
 masterVolumeValue.textContent = `${masterVolume.value}%`;
-refreshMasterButton();
+refreshDockPlayButton();
