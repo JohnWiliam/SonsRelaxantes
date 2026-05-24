@@ -63,7 +63,7 @@ function buildPlayer(key, label, index) {
     sliderValue,
     userVolume: Number(slider.value) / 100,
     isPlayable: true,
-    isSelected: false, // Nova memória de Estado
+    isSelected: false,
   };
 
   function updateVolume() {
@@ -88,7 +88,6 @@ function buildPlayer(key, label, index) {
     player.audio.pause();
   }
 
-  // Função central para alterar o estado do Card
   async function toggleSelection() {
     if (!player.isPlayable) return;
 
@@ -111,13 +110,11 @@ function buildPlayer(key, label, index) {
 
   player.slider.addEventListener('input', updateVolume);
 
-  // O clique no Card inteiro agora o ativa (desde que não seja no controle de volume)
   player.item.addEventListener('click', (e) => {
     if (e.target.closest('.sound-card__volume-wrap')) return;
     toggleSelection();
   });
 
-  // Acessibilidade: permite apertar Enter ou Espaço com o Card focado
   player.item.addEventListener('keydown', (e) => {
     if ((e.key === 'Enter' || e.key === ' ') && e.target === player.item) {
       e.preventDefault();
@@ -162,26 +159,54 @@ function renderDockIcon(isPlaying) {
   dockToggleAll.setAttribute('aria-label', isPlaying ? 'Pausar sons em reprodução' : 'Retomar sons pausados');
 }
 
+// 📌 NOVA FUNÇÃO: Atualiza a central de mídia do celular/computador
+function updateMediaSession(playing) {
+  // Verifica se o navegador suporta essa funcionalidade
+  if (!('mediaSession' in navigator)) return;
+
+  if (playing.length === 0) {
+    navigator.mediaSession.playbackState = 'paused';
+    return;
+  }
+
+  navigator.mediaSession.playbackState = 'playing';
+
+  // Lógica para mostrar o nome na tela de bloqueio
+  let titleText = 'Sons Relaxantes';
+  if (playing.length === 1) {
+    titleText = playing[0].label; // Se tocar só um, mostra o nome dele (ex: "Chuva")
+  } else if (playing.length > 1) {
+    titleText = `Mix de Sons (${playing.length})`; // Se tocar vários, avisa que é um Mix
+  }
+
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: titleText,
+    artist: 'Blanket Web',
+    album: 'Deck de Áudios',
+    artwork: [
+      // Aqui nós referenciamos a imagem que você vai colocar na pasta assets!
+      { src: './assets/cover.png', sizes: '512x512', type: 'image/png' }
+    ]
+  });
+}
+
 function syncDockState() {
   const playing = getPlayingPlayers();
   renderDockIcon(playing.length > 0);
+  updateMediaSession(playing); // Chamamos a nossa nova função aqui!
 }
 
 async function toggleDockPlayback() {
   const playing = getPlayingPlayers();
 
-  // Se tem áudio rolando, pausamos todos. Repare que NÃO mexemos no player.isSelected!
   if (playing.length > 0) {
     playing.forEach((player) => player.pause());
     syncDockState();
     return;
   }
 
-  // Se nada está tocando, buscamos todos os cards que estão com isSelected marcado
   const targets = state.players.filter((player) => player.isSelected && player.isPlayable);
 
-  // Detalhe amigável: se o usuário clicar no Play global sem ter escolhido nenhum som,
-  // nós selecionamos o primeiro som como exemplo.
   if (targets.length === 0 && state.players.length > 0) {
     const first = state.players[0];
     first.isSelected = true;
@@ -208,6 +233,12 @@ function toggleDockVolumePanel(forceOpen) {
   }
 
   dockVolumeToggle.setAttribute('aria-expanded', String(shouldOpen));
+}
+
+// 📌 BÔNUS: Permite usar os botões Play/Pause do próprio celular
+if ('mediaSession' in navigator) {
+  navigator.mediaSession.setActionHandler('play', () => toggleDockPlayback());
+  navigator.mediaSession.setActionHandler('pause', () => toggleDockPlayback());
 }
 
 state.players = SOUND_LIBRARY.map(([key, label], index) => buildPlayer(key, label, index));
